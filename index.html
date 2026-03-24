@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🌍 منصة المهام العالمية</title>
+    <link href="style.css" rel="stylesheet" />
+    <script src="firebase-config.js"></script>
+    <script src="data.js"></script>
+    <script src="security.js"></script>
+    <script src="admin.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>🌍 منصة المهام العالمية</h1>
+      <button onclick="switchLanguage('ar')">العربية</button>
+      <button onclick="switchLanguage('en')">English</button>
+    </header>
+
+    <section id="login-section">
+      <h2>تسجيل الدخول</h2>
+      <input type="email" id="email" placeholder="البريد الإلكتروني" />
+      <input type="password" id="password" placeholder="كلمة المرور" />
+      <button onclick="login()">تسجيل الدخول</button>
+    </section>
+
+    <section id="tasks-section">
+      <h2>📋 المهام المتاحة</h2>
+      <ul id="task-list"></ul>
+    </section>
+
+    <section id="withdraw-section">
+      <h2>💸 طلب سحب</h2>
+      <input type="text" id="w-phone" placeholder="رقم فودافون كاش" />
+      <input type="number" id="w-amount" placeholder="المبلغ" />
+      <button onclick="doWithdraw()">سحب</button>
+      <div id="w-msg"></div>
+    </section>
+
+    <section id="news-section">
+      <h2>📰 آخر الأخبار</h2>
+      <ul id="news-list"></ul>
+    </section>
+
+    <section id="leaderboard-section">
+      <h2>🏆 لوحة الترتيب</h2>
+      <ol id="leaderboard"></ol>
+    </section>
+
+    <section id="support-section">
+      <h2>💬 الدعم الفني</h2>
+      <textarea id="support-msg" placeholder="اكتب رسالتك هنا"></textarea>
+      <button onclick="sendSupport()">إرسال</button>
+    </section>
+
+    <section id="admin-panel" style="display:none;">
+      <h2>🧊 لوحة التحكم</h2>
+      <div id="users"></div>
+      <div id="alerts"></div>
+      <canvas id="statsChart"></canvas>
+    </section>
+  </body>
+</html>
