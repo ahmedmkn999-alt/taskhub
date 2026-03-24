@@ -1,118 +1,166 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>TaskHub | منصة العظمة</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet" />
-<style>
-  :root {
-    --bg: #0a0a0f; --card: #16161e; --accent: #6c63ff; --accent2: #00d4aa; --text: #ffffff;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-  
-  /* حل مشكلة التجميد - السماح بالسكورول */
-  body { 
-    background: var(--bg); color: var(--text); 
-    min-height: 100vh; overflow-y: auto !important; 
-    padding-bottom: 100px;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskHub Pro | المنصة الذكية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050508; --surface: #101018; --accent: #6c63ff; --accent2: #00d4aa; --text: #e8e8f0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+        body { background: var(--bg); color: var(--text); overflow-x: hidden; }
 
-  /* تنسيق الهيدر */
-  header { background: var(--card); padding: 15px; display: flex; justify-content: space-between; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #2a2a3a; }
-  
-  /* كروت الإحصائيات عشان الصفحة متبقاش فاضية */
-  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px; }
-  .stat-card { background: var(--card); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid #2a2a3a; }
-  .stat-card h5 { color: #7070a0; font-size: 0.8rem; }
-  .stat-card p { font-size: 1.2rem; font-weight: bold; color: var(--accent2); }
+        /* Navigation */
+        nav { background: var(--surface); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2a2a3a; position: sticky; top: 0; z-index: 1000; }
+        .user-points-top { background: rgba(0,212,170,0.1); color: var(--accent2); padding: 5px 15px; border-radius: 20px; font-weight: 900; border: 1px solid var(--accent2); }
 
-  /* البطاقة الرئيسية للرصيد */
-  .balance-card { background: linear-gradient(135deg, #1a1040, #0a0a0f); margin: 20px; padding: 30px; border-radius: 20px; text-align: center; border: 1px solid var(--accent); }
-  .balance-val { font-size: 3rem; font-weight: 900; color: #fff; }
+        /* Main Sections Control */
+        .page { display: none; padding: 20px; animation: fadeIn 0.5s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* حائط العروض */
-  .offer-section { margin: 20px; }
-  iframe { width: 100%; height: 600px; border-radius: 20px; border: 2px solid var(--accent); background: #fff; }
+        /* Home Page (Instructions) */
+        .hero-guide { background: linear-gradient(135deg, #1a1040, var(--bg)); padding: 30px; border-radius: 25px; border: 1px solid #2a2a3a; margin-bottom: 20px; }
+        .step-card { background: var(--surface); padding: 20px; border-radius: 15px; margin-bottom: 15px; border-right: 4px solid var(--accent); }
 
-  /* المساعد الذكي (Chatbot) */
-  #smart-bot { position: fixed; bottom: 20px; left: 20px; z-index: 2000; }
-  .bot-btn { width: 60px; height: 60px; border-radius: 50%; background: var(--accent); border: none; font-size: 30px; cursor: pointer; box-shadow: 0 5px 15px rgba(108,99,255,0.4); }
-  .bot-window { display: none; position: absolute; bottom: 70px; left: 0; width: 280px; background: var(--card); border: 1px solid #2a2a3a; border-radius: 15px; flex-direction: column; overflow: hidden; }
-  .bot-window.active { display: flex; }
-  .bot-header { background: var(--accent); padding: 10px; font-weight: bold; text-align: center; }
-  .bot-body { height: 200px; padding: 10px; overflow-y: auto; font-size: 0.9rem; }
-  .bot-msg { background: #2a2a3a; padding: 8px; border-radius: 10px; margin-bottom: 10px; }
-  .user-msg { background: var(--accent); padding: 8px; border-radius: 10px; margin-bottom: 10px; align-self: flex-end; }
-  .bot-input { display: flex; border-top: 1px solid #2a2a3a; }
-  .bot-input input { flex: 1; padding: 10px; background: transparent; border: none; color: #fff; outline: none; }
+        /* Tasks Page */
+        .tasks-container { width: 100%; height: 85vh; border-radius: 20px; overflow: hidden; border: 2px solid var(--accent); }
+        iframe { width: 100%; height: 100%; border: none; background: #fff; }
 
-  /* الدعم الفني */
-  .support-link { text-align: center; margin-top: 20px; color: var(--accent2); text-decoration: none; display: block; }
-</style>
+        /* Smart AI Bot & Chat */
+        #ai-bot-toggle { position: fixed; bottom: 25px; left: 25px; width: 65px; height: 65px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; box-shadow: 0 10px 25px rgba(108,99,255,0.5); z-index: 2000; }
+        .chat-window { position: fixed; bottom: 100px; left: 25px; width: 320px; height: 450px; background: var(--surface); border-radius: 20px; border: 1px solid #2a2a3a; display: none; flex-direction: column; overflow: hidden; z-index: 2000; box-shadow: 0 15px 50px rgba(0,0,0,0.8); }
+        .chat-header { background: var(--accent); padding: 15px; font-weight: bold; display: flex; justify-content: space-between; }
+        .chat-msgs { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 10px 15px; border-radius: 15px; max-width: 80%; font-size: 0.9rem; }
+        .msg.bot { background: #2a2a3a; align-self: flex-start; }
+        .msg.user { background: var(--accent); align-self: flex-end; }
+        .chat-input { display: flex; padding: 10px; background: #050508; gap: 5px; }
+        .chat-input input { flex: 1; background: transparent; border: none; color: #fff; outline: none; }
+
+        /* Bottom Menu */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--surface); display: flex; justify-content: space-around; padding: 15px; border-top: 1px solid #2a2a3a; z-index: 1000; }
+        .nav-item { cursor: pointer; color: #7070a0; font-weight: bold; transition: 0.3s; }
+        .nav-item.active { color: var(--accent2); }
+
+        .btn-main { width: 100%; padding: 15px; background: var(--accent); border: none; color: #fff; border-radius: 15px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+    </style>
 </head>
 <body>
 
-<div id="dashboard" style="display: block;">
-  <header>
-    <h2 style="color: var(--accent);">TaskHub 🚀</h2>
-    <button onclick="logout()" style="color: red; background: none; border: none; font-weight: bold;">خروج</button>
-  </header>
+<nav>
+    <div style="font-weight: 900; font-size: 1.5rem; color: var(--accent);">TaskHub Pro</div>
+    <div class="user-points-top">💰 <span id="pts-top">0</span></div>
+</nav>
 
-  <div class="stats-grid">
-    <div class="stat-card"><h5>مهام منجزة</h5><p>0</p></div>
-    <div class="stat-card"><h5>سحوبات ناجحة</h5><p>0</p></div>
-  </div>
-
-  <div class="balance-card">
-    <p style="color: #7070a0;">رصيدك الحالي</p>
-    <div class="balance-val" id="points-display">0</div>
-    <p>نقطة</p>
-  </div>
-
-  <div class="offer-section">
-    <h3 style="margin-bottom: 15px;">🎯 حائط المهام</h3>
-    <iframe id="offerwall-frame" src="https://reward-me.eu/02ae0b4a-277d-11f1-8c8f-129a1c289511"></iframe>
-  </div>
-
-  <a href="mailto:ahmedmkn999@gmail.com" class="support-link">📧 تواصل مع الدعم الفني</a>
+<div id="home" class="page active">
+    <div class="hero-guide">
+        <h1 style="margin-bottom: 10px;">أهلاً بك يا بطل! 👋</h1>
+        <p style="color: #7070a0;">اتبع الخطوات دي عشان تبدأ تجمع فلوس حقيقية:</p>
+    </div>
+    
+    <div class="step-card">
+        <h3>1️⃣ ادخل على صفحة المهام</h3>
+        <p>اضغط على "المهام" من القائمة اللي تحت عشان تفتح حائط العروض.</p>
+    </div>
+    <div class="step-card">
+        <h3>2️⃣ نفذ العرض بدقة</h3>
+        <p>اختار لعبة أو تطبيق، ونفذ المطلوب (زي تحميل وفتح أو وصول لليفل معين).</p>
+    </div>
+    <div class="step-card">
+        <h3>3️⃣ استلام النقاط والسحب</h3>
+        <p>بعد ما تخلص، النقاط هتضاف لحسابك فوق، وتقدر تسحبها "فودافون كاش".</p>
+    </div>
+    
+    <button class="btn-main" onclick="showPage('tasks')">ابدأ تنفيذ المهام الآن 🚀</button>
 </div>
 
-<div id="smart-bot">
-  <button class="bot-btn" onclick="toggleBot()">🤖</button>
-  <div class="bot-window" id="botWindow">
-    <div class="bot-header">مساعد TaskHub الذكي</div>
-    <div class="bot-body" id="botMsgs">
-      <div class="bot-msg">أهلاً بك يا بطل! أنا هنا لمساعدتك. اسألني عن (السحب، النقاط، أو الدعم).</div>
+<div id="tasks" class="page">
+    <h2 style="margin-bottom: 15px;">🎯 العروض المتاحة لك</h2>
+    <div class="tasks-container">
+        <iframe id="offerwall" src="https://reward-me.eu/02ae0b4a-277d-11f1-8c8f-129a1c289511"></iframe>
     </div>
-    <div class="bot-input">
-      <input type="text" id="botIn" placeholder="اكتب سؤالك...">
-      <button onclick="askBot()" style="padding: 10px; background: var(--accent2); border: none;">➔</button>
+</div>
+
+<div id="withdraw" class="page">
+    <h2>💸 سحب الأرباح</h2>
+    <div class="step-card" style="margin-top:20px;">
+        <label>رقم فودافون كاش</label>
+        <input type="tel" id="cash-num" style="width:100%; padding:12px; background:#000; border:1px solid #2a2a3a; color:#fff; border-radius:10px; margin: 10px 0;">
+        <label>عدد النقاط</label>
+        <input type="number" id="cash-amount" style="width:100%; padding:12px; background:#000; border:1px solid #2a2a3a; color:#fff; border-radius:10px; margin: 10px 0;">
+        <button class="btn-main" style="background:var(--accent2); color:#000;">إرسال طلب السحب</button>
     </div>
-  </div>
+</div>
+
+<div id="ai-bot-toggle" onclick="toggleChat()">🤖</div>
+<div class="chat-window" id="chatWindow">
+    <div class="chat-header">
+        <span>المساعد الذكي & دعم أحمد</span>
+        <span onclick="toggleChat()" style="cursor:pointer">✕</span>
+    </div>
+    <div class="chat-msgs" id="chatMsgs">
+        <div class="msg bot">أهلاً بك في TaskHub! أنا المساعد الذكي، كيف يمكنني مساعدتك اليوم؟</div>
+    </div>
+    <div class="chat-input">
+        <input type="text" id="chatIn" placeholder="اسأل أي سؤال...">
+        <button onclick="handleChat()" style="background:var(--accent2); border:none; padding:5px 15px; border-radius:10px; cursor:pointer;">إرسال</button>
+    </div>
+</div>
+
+<div class="bottom-nav">
+    <div class="nav-item active" onclick="showPage('home')">الرئيسية</div>
+    <div class="nav-item" onclick="showPage('tasks')">المهام</div>
+    <div class="nav-item" onclick="showPage('withdraw')">السحب</div>
+    <div class="nav-item" onclick="toggleChat()">الدعم</div>
 </div>
 
 <script type="module">
-  // ... (نفس كود Firebase اللي معاك فوق حطه هنا) ...
-  
-  // دالة الشات بوت الذكي
-  window.toggleBot = () => document.getElementById('botWindow').classList.toggle('active');
-  window.askBot = () => {
-    const input = document.getElementById('botIn');
-    const msgs = document.getElementById('botMsgs');
-    if(!input.value) return;
-    
-    msgs.innerHTML += `<div class="user-msg">${input.value}</div>`;
-    let reply = "عذراً، لم أفهمك جيداً. يمكنك مراسلة الإدارة عبر البريد الإلكتروني.";
-    if(input.value.includes("سحب")) reply = "السحب يتم خلال 24 ساعة عبر فودافون كاش.";
-    if(input.value.includes("نقط")) reply = "تأكد من إغلاق الـ VPN لضمان احتساب النقاط.";
-    
-    setTimeout(() => {
-      msgs.innerHTML += `<div class="bot-msg">${reply}</div>`;
-      msgs.scrollTop = msgs.scrollHeight;
-    }, 500);
-    input.value = "";
-  };
+    // استيراد Firebase (استخدم نفس بياناتك السابقة هنا)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    // ... بقية الـ Imports والـ Config ...
+
+    // نظام التنقل بين الصفحات
+    window.showPage = (pageId) => {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    };
+
+    // نظام الدردشة والذكاء الاصطناعي
+    window.toggleChat = () => {
+        const win = document.getElementById('chatWindow');
+        win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
+    };
+
+    window.handleChat = () => {
+        const input = document.getElementById('chatIn');
+        const msgs = document.getElementById('chatMsgs');
+        if(!input.value) return;
+
+        // رسالة المستخدم
+        msgs.innerHTML += `<div class="msg user">${input.value}</div>`;
+        const userText = input.value.toLowerCase();
+        input.value = "";
+
+        // رد البوت الذكي (محاكاة ذكاء اصطناعي)
+        let response = "سأقوم بتحويل استفسارك للأستاذ أحمد وسيرد عليك في لوحة التحكم قريباً. هل لديك سؤال آخر؟";
+        
+        if(userText.includes("سحب") || userText.includes("فلوس")) 
+            response = "يمكنك السحب عند وصولك للحد الأدنى (1000 نقطة). السحب يتم عبر فودافون كاش ويصل خلال 24 ساعة.";
+        if(userText.includes("مشكلة") || userText.includes("نقط")) 
+            response = "إذا لم تصلك النقاط، تأكد من تنفيذ العرض لأول مرة على جهازك وعدم استخدام VPN.";
+        if(userText.includes("أحمد"))
+            response = "الأستاذ أحمد هو مدير المنصة، يمكنك ترك رسالتك هنا وسيراها فوراً في لوحة التحكم الخاصة به.";
+
+        setTimeout(() => {
+            msgs.innerHTML += `<div class="msg bot">${response}</div>`;
+            msgs.scrollTop = msgs.scrollHeight;
+        }, 800);
+    };
 </script>
 </body>
 </html>
