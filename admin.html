@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة التحكم | أحمد</title>
+    <style>
+        body { font-family: 'Cairo'; background: #050508; color: white; padding: 20px; }
+        .card { background: #13131a; padding: 25px; border-radius: 15px; border: 1px solid #6c63ff; margin-bottom: 20px; }
+        input, button { padding: 12px; border-radius: 8px; border: none; margin: 5px; }
+        input { background: #0a0a0f; color: white; width: 250px; border: 1px solid #2a2a3a; }
+        button { background: #6c63ff; color: white; font-weight: bold; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border: 1px solid #2a2a3a; text-align: center; }
+        th { background: #6c63ff; }
+    </style>
+</head>
+<body>
+    <h1>مرحباً يا أحمد ⚙️ (المدير العام)</h1>
+
+    <div class="card">
+        <h3>💰 تعديل رصيد مستخدم</h3>
+        <input type="text" id="targetUid" placeholder="UID المستخدم">
+        <input type="number" id="targetPts" placeholder="عدد النقاط الجديد">
+        <button onclick="updatePoints()">تحديث الرصيد</button>
+    </div>
+
+    <div class="card">
+        <h3>🚨 إرسال تنبيه عام للموقع</h3>
+        <input type="text" id="alertMsg" style="width: 80%;" placeholder="اكتب التنبيه هنا...">
+        <button onclick="sendAlert()">إرسال</button>
+    </div>
+
+    <script type="module">
+        import { auth, db } from './firebase-config.js';
+        import { doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        auth.onAuthStateChanged(user => {
+            if (!user || user.email !== "ahmedmkn999@gmail.com") window.location.href = "auth.html";
+        });
+
+        window.updatePoints = async () => {
+            const uid = document.getElementById('targetUid').value;
+            const pts = document.getElementById('targetPts').value;
+            await updateDoc(doc(db, "users", uid), { points: parseInt(pts) });
+            alert("✅ تم التحديث!");
+        };
+    </script>
+</body>
+</html>
