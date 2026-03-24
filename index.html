@@ -1,132 +1,150 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskHub | واجهة المهام</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        :root { --accent: #6c63ff; --accent2: #00d4aa; --bg: #0a0a0f; --card: #1a1a24; --border: #2a2a3a; }
-        body { font-family: 'Cairo'; background: var(--bg); color: white; margin: 0; padding-bottom: 50px; }
-        .container { max-width: 1000px; margin: auto; padding: 20px; }
-        
-        /* Navbar */
-        .nav { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 15px 25px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
-        .points-badge { background: var(--accent2); color: black; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 18px; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TaskHub | منصة المهام</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0a0a0f; --card: #16161e; --accent: #6c63ff; --accent2: #00d4aa; --text: #ffffff; --muted: #7070a0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+  body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
-        /* Sections */
-        .hero { background: linear-gradient(135deg, #1a1a24 0%, #0a0a0f 100%); padding: 40px; border-radius: 20px; margin-top: 20px; border: 1px solid var(--border); text-align: center; }
-        .section-title { margin: 30px 0 15px; color: var(--accent); font-size: 22px; display: flex; align-items: center; gap: 10px; }
-        
-        .how-it-works { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
-        .step { background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid var(--border); }
-        
-        iframe { width: 100%; height: 700px; border-radius: 20px; border: 2px solid var(--accent); margin-top: 20px; background: white; }
+  /* تنسيق شاشة الدخول - منع التداخل */
+  .auth-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+  .auth-box { background: var(--card); padding: 30px; border-radius: 20px; width: 100%; max-width: 400px; border: 1px solid #2a2a3a; text-align: center; }
+  .logo { font-size: 2.5rem; font-weight: 900; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; }
+  
+  input { width: 100%; padding: 12px; margin-bottom: 15px; background: #000; border: 1px solid #2a2a3a; border-radius: 10px; color: #fff; outline: none; transition: 0.3s; }
+  input:focus { border-color: var(--accent); }
+  
+  .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+  .btn-primary { background: var(--accent); color: #fff; margin-bottom: 10px; }
+  .btn-primary:hover { background: #5a52d4; }
 
-        /* Bot Style */
-        #bot-container { position: fixed; bottom: 20px; left: 20px; z-index: 1000; }
-        .bot-trigger { width: 60px; height: 60px; border-radius: 50%; background: var(--accent); border: none; cursor: pointer; font-size: 30px; box-shadow: 0 5px 15px rgba(108,99,255,0.4); }
-        .bot-window { display: none; position: absolute; bottom: 75px; left: 0; width: 300px; background: var(--card); border: 1px solid var(--border); border-radius: 15px; flex-direction: column; overflow: hidden; }
-        .bot-window.active { display: flex; }
-        .bot-header { background: var(--accent); padding: 10px; font-weight: bold; text-align: center; }
-        .bot-msgs { height: 250px; padding: 10px; overflow-y: auto; font-size: 14px; }
-        .msg { margin-bottom: 10px; padding: 8px 12px; border-radius: 10px; width: fit-content; max-width: 85%; }
-        .bot { background: var(--border); }
-        .user { background: var(--accent); margin-right: auto; }
-        .bot-input { display: flex; border-top: 1px solid var(--border); }
-        .bot-input input { flex: 1; padding: 10px; background: transparent; border: none; color: white; outline: none; }
-    </style>
+  /* تنسيق واجهة المستخدم (الداشبورد) */
+  #dashboard, #admin-panel { display: none; padding: 20px; max-width: 600px; margin: auto; }
+  .balance-card { background: linear-gradient(135deg, #1a1040, #0a0a0f); padding: 30px; border-radius: 20px; border: 1px solid var(--accent); text-align: center; margin-bottom: 20px; }
+  .balance-val { font-size: 3rem; font-weight: 900; color: var(--accent2); }
+
+  /* لوحة التحكم (الأدمن) */
+  .admin-card { background: #1a1a24; border: 1px solid var(--accent2); padding: 20px; border-radius: 15px; margin-top: 20px; }
+  
+  iframe { width: 100%; height: 500px; border-radius: 15px; border: none; background: #fff; margin-top: 15px; }
+</style>
 </head>
 <body>
 
-    <div class="nav">
-        <h2 style="color: var(--accent); margin:0;">TaskHub 🚀</h2>
-        <div style="display: flex; gap: 15px; align-items: center;">
-            <div class="points-badge">💰 <span id="userPoints">0</span></div>
-            <button onclick="logout()" style="background:none; border:none; color: #ff4f6a; cursor:pointer; font-weight:bold;">خروج</button>
-        </div>
-    </div>
+<div id="auth-screen" class="auth-container">
+  <div class="auth-box">
+    <div class="logo">TaskHub</div>
+    <input type="email" id="email" placeholder="البريد الإلكتروني" />
+    <input type="password" id="pass" placeholder="كلمة المرور" />
+    <button class="btn btn-primary" onclick="handleAuth()">دخول / تسجيل</button>
+    <p id="auth-msg" style="font-size: 0.8rem; color: var(--muted);"></p>
+  </div>
+</div>
 
-    <div class="container">
-        <div class="hero">
-            <h1>أهلاً بك في أقوى منصة للمهام! 🏆</h1>
-            <p style="color: #7070a0;">نفذ المهام البسيطة، جمع النقاط، واسحب أرباحك فوراً على فودافون كاش.</p>
-        </div>
+<div id="dashboard">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h3>أهلاً بك 🚀</h3>
+    <button onclick="logout()" style="color: red; background: none; border: none; cursor: pointer;">خروج</button>
+  </div>
+  <div class="balance-card">
+    <p>رصيدك الحالي</p>
+    <div class="balance-val" id="user-points">0</div>
+    <p>نقطة</p>
+  </div>
+  <h4>🎯 المهام المتاحة</h4>
+  <iframe id="offerwall" src=""></iframe>
+</div>
 
-        <div class="section-title">💡 كيف تبدأ؟</div>
-        <div class="how-it-works">
-            <div class="step"><h3>1. اختر مهمة</h3><p>ادخل على حائط العروض واختار العرض اللي يناسبك.</p></div>
-            <div class="step"><h3>2. نفذ الشروط</h3><p>حمل اللعبة أو سجل في الموقع المطلوب بدقة.</p></div>
-            <div class="step"><h3>3. استلم نقاطك</h3><p>النقاط بتوصلك أول ما الشركة تتأكد من تنفيذك للعرض.</p></div>
-        </div>
+<div id="admin-panel">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="color: var(--accent2);">لوحة تحكم أحمد ⚙️</h2>
+    <button onclick="logout()" style="color: red; background: none; border: none; cursor: pointer;">خروج</button>
+  </div>
+  <div class="admin-card">
+    <h3>تعديل نقاط مستخدم</h3>
+    <input type="text" id="target-uid" placeholder="UID المستخدم" />
+    <input type="number" id="new-points" placeholder="عدد النقاط" />
+    <button class="btn btn-primary" onclick="updatePoints()">تحديث النقاط</button>
+  </div>
+  <div class="admin-card">
+    <h3>طلبات السحب المعلقة</h3>
+    <p style="color: var(--muted);">سيتم عرض الطلبات هنا قريباً...</p>
+  </div>
+</div>
 
-        <div class="section-title">🔥 حائط العروض (MyLead)</div>
-        <iframe id="offerWall"></iframe>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        <div class="section-title">📩 الدعم والمساعدة</div>
-        <div class="step" style="text-align: center; width: 100%;">
-            راسلنا في أي وقت على: <br>
-            <a href="mailto:ahmedmkn999@gmail.com" style="color: var(--accent2); font-weight: bold; text-decoration: none;">ahmedmkn999@gmail.com</a>
-        </div>
-    </div>
+// إعدادات Firebase الخاصة بك
+const firebaseConfig = {
+  apiKey: "AIzaSyDwMOax-amBzEm3FDjXKN8yBbB3cXNbb14",
+  authDomain: "taskhub-9d282.firebaseapp.com",
+  projectId: "taskhub-9d282",
+  storageBucket: "taskhub-9d282.firebasestorage.app",
+  messagingSenderId: "981675153894",
+  appId: "1:981675153894:web:380c4194bb4ea9e1f51e27"
+};
 
-    <div id="bot-container">
-        <button class="bot-trigger" onclick="toggleBot()">🤖</button>
-        <div class="bot-window" id="botWindow">
-            <div class="bot-header">مساعد أحمد الذكي</div>
-            <div class="bot-msgs" id="botMsgs">
-                <div class="msg bot">أهلاً بك! أنا هنا لمساعدتك. اسألني عن السحب أو العروض.</div>
-            </div>
-            <div class="bot-input">
-                <input type="text" id="botIn" placeholder="اكتب سؤالك...">
-                <button onclick="sendBot()" style="background:var(--accent2); border:none; padding:10px; cursor:pointer;">➔</button>
-            </div>
-        </div>
-    </div>
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-    <script type="module">
-        import { auth, db } from './firebase-config.js';
-        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const ADMIN_EMAIL = "ahmedmkn999@gmail.com";
 
-        const MY_EMAIL = "ahmedmkn999@gmail.com";
+// التحقق من حالة الدخول
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    document.getElementById("auth-screen").style.display = "none";
+    if (user.email === ADMIN_EMAIL) {
+      document.getElementById("admin-panel").style.display = "block";
+    } else {
+      document.getElementById("dashboard").style.display = "block";
+      loadUserData(user.uid);
+    }
+  } else {
+    document.getElementById("auth-screen").style.display = "flex";
+    document.getElementById("dashboard").style.display = "none";
+    document.getElementById("admin-panel").style.display = "none";
+  }
+});
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                if (user.email === MY_EMAIL) { window.location.href = "admin.html"; return; }
-                
-                // تحديث النقاط
-                onSnapshot(doc(db, "users", user.uid), (s) => {
-                    document.getElementById('userPoints').innerText = s.data()?.points || 0;
-                });
+// دالة الدخول والتسجيل التلقائي
+window.handleAuth = async () => {
+  const email = document.getElementById("email").value;
+  const pass = document.getElementById("pass").value;
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch (e) {
+    try {
+      const res = await createUserWithEmailAndPassword(auth, email, pass);
+      await setDoc(doc(db, "users", res.user.uid), { email, points: 0 });
+    } catch (err) { alert("خطأ في الدخول: " + err.message); }
+  }
+};
 
-                // رابط العروض
-                document.getElementById('offerWall').src = `https://bestlocker.eu/iframe/86150cd4-277d-11f1-9414-129a1c289511?ml_subid=${user.uid}`;
-            } else {
-                window.location.href = "auth.html";
-            }
-        });
+function loadUserData(uid) {
+  onSnapshot(doc(db, "users", uid), (snap) => {
+    if(snap.exists()) document.getElementById("user-points").innerText = snap.data().points || 0;
+  });
+  document.getElementById("offerwall").src = `https://reward-me.eu/02ae0b4a-277d-11f1-8c8f-129a1c289511?uid=${uid}`;
+}
 
-        window.logout = () => signOut(auth);
+window.updatePoints = async () => {
+  const uid = document.getElementById("target-uid").value;
+  const pts = document.getElementById("new-points").value;
+  await updateDoc(doc(db, "users", uid), { points: parseInt(pts) });
+  alert("تم التحديث!");
+};
 
-        // Bot Logic
-        window.toggleBot = () => document.getElementById('botWindow').classList.toggle('active');
-        window.sendBot = () => {
-            const input = document.getElementById('botIn');
-            const box = document.getElementById('botMsgs');
-            if(!input.value) return;
-            box.innerHTML += `<div class="msg user">${input.value}</div>`;
-            
-            let reply = "مش فاهم قصدك، بس تقدر تراسل أحمد على الإيميل المكتوب تحت.";
-            if(input.value.includes("سحب")) reply = "السحب بيوصل خلال 24 ساعة على فودافون كاش.";
-            if(input.value.includes("نقط")) reply = "تأكد إنك قافل الـ VPN عشان النقط تتحسب صح.";
-            
-            setTimeout(() => {
-                box.innerHTML += `<div class="msg bot">${reply}</div>`;
-                box.scrollTop = box.scrollHeight;
-            }, 600);
-            input.value = "";
-        };
-    </script>
+window.logout = () => signOut(auth);
+</script>
 </body>
 </html>
