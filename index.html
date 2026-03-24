@@ -1,63 +1,132 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>🌍 منصة المهام العالمية</title>
-    <link href="style.css" rel="stylesheet" />
-    <script src="firebase-config.js"></script>
-    <script src="data.js"></script>
-    <script src="security.js"></script>
-    <script src="admin.js"></script>
-  </head>
-  <body>
-    <header>
-      <h1>🌍 منصة المهام العالمية</h1>
-      <button onclick="switchLanguage('ar')">العربية</button>
-      <button onclick="switchLanguage('en')">English</button>
-    </header>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskHub | واجهة المهام</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --accent: #6c63ff; --accent2: #00d4aa; --bg: #0a0a0f; --card: #1a1a24; --border: #2a2a3a; }
+        body { font-family: 'Cairo'; background: var(--bg); color: white; margin: 0; padding-bottom: 50px; }
+        .container { max-width: 1000px; margin: auto; padding: 20px; }
+        
+        /* Navbar */
+        .nav { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 15px 25px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+        .points-badge { background: var(--accent2); color: black; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 18px; }
 
-    <section id="login-section">
-      <h2>تسجيل الدخول</h2>
-      <input type="email" id="email" placeholder="البريد الإلكتروني" />
-      <input type="password" id="password" placeholder="كلمة المرور" />
-      <button onclick="login()">تسجيل الدخول</button>
-    </section>
+        /* Sections */
+        .hero { background: linear-gradient(135deg, #1a1a24 0%, #0a0a0f 100%); padding: 40px; border-radius: 20px; margin-top: 20px; border: 1px solid var(--border); text-align: center; }
+        .section-title { margin: 30px 0 15px; color: var(--accent); font-size: 22px; display: flex; align-items: center; gap: 10px; }
+        
+        .how-it-works { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .step { background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid var(--border); }
+        
+        iframe { width: 100%; height: 700px; border-radius: 20px; border: 2px solid var(--accent); margin-top: 20px; background: white; }
 
-    <section id="tasks-section">
-      <h2>📋 المهام المتاحة</h2>
-      <ul id="task-list"></ul>
-    </section>
+        /* Bot Style */
+        #bot-container { position: fixed; bottom: 20px; left: 20px; z-index: 1000; }
+        .bot-trigger { width: 60px; height: 60px; border-radius: 50%; background: var(--accent); border: none; cursor: pointer; font-size: 30px; box-shadow: 0 5px 15px rgba(108,99,255,0.4); }
+        .bot-window { display: none; position: absolute; bottom: 75px; left: 0; width: 300px; background: var(--card); border: 1px solid var(--border); border-radius: 15px; flex-direction: column; overflow: hidden; }
+        .bot-window.active { display: flex; }
+        .bot-header { background: var(--accent); padding: 10px; font-weight: bold; text-align: center; }
+        .bot-msgs { height: 250px; padding: 10px; overflow-y: auto; font-size: 14px; }
+        .msg { margin-bottom: 10px; padding: 8px 12px; border-radius: 10px; width: fit-content; max-width: 85%; }
+        .bot { background: var(--border); }
+        .user { background: var(--accent); margin-right: auto; }
+        .bot-input { display: flex; border-top: 1px solid var(--border); }
+        .bot-input input { flex: 1; padding: 10px; background: transparent; border: none; color: white; outline: none; }
+    </style>
+</head>
+<body>
 
-    <section id="withdraw-section">
-      <h2>💸 طلب سحب</h2>
-      <input type="text" id="w-phone" placeholder="رقم فودافون كاش" />
-      <input type="number" id="w-amount" placeholder="المبلغ" />
-      <button onclick="doWithdraw()">سحب</button>
-      <div id="w-msg"></div>
-    </section>
+    <div class="nav">
+        <h2 style="color: var(--accent); margin:0;">TaskHub 🚀</h2>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <div class="points-badge">💰 <span id="userPoints">0</span></div>
+            <button onclick="logout()" style="background:none; border:none; color: #ff4f6a; cursor:pointer; font-weight:bold;">خروج</button>
+        </div>
+    </div>
 
-    <section id="news-section">
-      <h2>📰 آخر الأخبار</h2>
-      <ul id="news-list"></ul>
-    </section>
+    <div class="container">
+        <div class="hero">
+            <h1>أهلاً بك في أقوى منصة للمهام! 🏆</h1>
+            <p style="color: #7070a0;">نفذ المهام البسيطة، جمع النقاط، واسحب أرباحك فوراً على فودافون كاش.</p>
+        </div>
 
-    <section id="leaderboard-section">
-      <h2>🏆 لوحة الترتيب</h2>
-      <ol id="leaderboard"></ol>
-    </section>
+        <div class="section-title">💡 كيف تبدأ؟</div>
+        <div class="how-it-works">
+            <div class="step"><h3>1. اختر مهمة</h3><p>ادخل على حائط العروض واختار العرض اللي يناسبك.</p></div>
+            <div class="step"><h3>2. نفذ الشروط</h3><p>حمل اللعبة أو سجل في الموقع المطلوب بدقة.</p></div>
+            <div class="step"><h3>3. استلم نقاطك</h3><p>النقاط بتوصلك أول ما الشركة تتأكد من تنفيذك للعرض.</p></div>
+        </div>
 
-    <section id="support-section">
-      <h2>💬 الدعم الفني</h2>
-      <textarea id="support-msg" placeholder="اكتب رسالتك هنا"></textarea>
-      <button onclick="sendSupport()">إرسال</button>
-    </section>
+        <div class="section-title">🔥 حائط العروض (MyLead)</div>
+        <iframe id="offerWall"></iframe>
 
-    <section id="admin-panel" style="display:none;">
-      <h2>🧊 لوحة التحكم</h2>
-      <div id="users"></div>
-      <div id="alerts"></div>
-      <canvas id="statsChart"></canvas>
-    </section>
-  </body>
+        <div class="section-title">📩 الدعم والمساعدة</div>
+        <div class="step" style="text-align: center; width: 100%;">
+            راسلنا في أي وقت على: <br>
+            <a href="mailto:ahmedmkn999@gmail.com" style="color: var(--accent2); font-weight: bold; text-decoration: none;">ahmedmkn999@gmail.com</a>
+        </div>
+    </div>
+
+    <div id="bot-container">
+        <button class="bot-trigger" onclick="toggleBot()">🤖</button>
+        <div class="bot-window" id="botWindow">
+            <div class="bot-header">مساعد أحمد الذكي</div>
+            <div class="bot-msgs" id="botMsgs">
+                <div class="msg bot">أهلاً بك! أنا هنا لمساعدتك. اسألني عن السحب أو العروض.</div>
+            </div>
+            <div class="bot-input">
+                <input type="text" id="botIn" placeholder="اكتب سؤالك...">
+                <button onclick="sendBot()" style="background:var(--accent2); border:none; padding:10px; cursor:pointer;">➔</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, db } from './firebase-config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const MY_EMAIL = "ahmedmkn999@gmail.com";
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                if (user.email === MY_EMAIL) { window.location.href = "admin.html"; return; }
+                
+                // تحديث النقاط
+                onSnapshot(doc(db, "users", user.uid), (s) => {
+                    document.getElementById('userPoints').innerText = s.data()?.points || 0;
+                });
+
+                // رابط العروض
+                document.getElementById('offerWall').src = `https://bestlocker.eu/iframe/86150cd4-277d-11f1-9414-129a1c289511?ml_subid=${user.uid}`;
+            } else {
+                window.location.href = "auth.html";
+            }
+        });
+
+        window.logout = () => signOut(auth);
+
+        // Bot Logic
+        window.toggleBot = () => document.getElementById('botWindow').classList.toggle('active');
+        window.sendBot = () => {
+            const input = document.getElementById('botIn');
+            const box = document.getElementById('botMsgs');
+            if(!input.value) return;
+            box.innerHTML += `<div class="msg user">${input.value}</div>`;
+            
+            let reply = "مش فاهم قصدك، بس تقدر تراسل أحمد على الإيميل المكتوب تحت.";
+            if(input.value.includes("سحب")) reply = "السحب بيوصل خلال 24 ساعة على فودافون كاش.";
+            if(input.value.includes("نقط")) reply = "تأكد إنك قافل الـ VPN عشان النقط تتحسب صح.";
+            
+            setTimeout(() => {
+                box.innerHTML += `<div class="msg bot">${reply}</div>`;
+                box.scrollTop = box.scrollHeight;
+            }, 600);
+            input.value = "";
+        };
+    </script>
+</body>
 </html>
